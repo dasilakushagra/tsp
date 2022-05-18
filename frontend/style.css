@@ -1,0 +1,12 @@
+.map{
+    width:500px;
+  }
+  
+  .map_marker
+  {
+  position:relative;width:34px;height:48px
+  }
+  /*marker text span CSS*/
+  .my-div-span { position: absolute;left:1.5em;right: 1em;top:1.4em;bottom:2.5em;font-size:9px;font-weight:bold;width:1px;color:black;
+  }
+  
