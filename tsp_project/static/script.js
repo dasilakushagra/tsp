@@ -1,4 +1,4 @@
-var map=new MapmyIndia.Map("map",{ center:[28.61, 77.23],zoomControl: true,hybrid:true });
+var map=new MapmyIndia.Map("map",{ center:[29.406104996908546,79.19501305399261],zoomControl: true,hybrid:true });
 let loc="";
 map.on("click", function (e)
 {
@@ -26,4 +26,7 @@ submitBtn.addEventListener('click',async function(){
         const res=await fetch(`http://127.0.0.1:5000/api?loc=${loc}`)
         const data=await res.json()
         console.log(data)
+        setTimeout(()=>{
+        window.location.href=`http://127.0.0.1:5000/result?data=${data.cord}`
+        },1000)       
 })
