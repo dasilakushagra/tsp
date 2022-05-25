@@ -11,7 +11,6 @@ import requests
  
 app = Flask(__name__)
 
-
 @app.route("/static/<path:path>")
 def static_dir(path):
     return send_from_directory("static", path)
@@ -25,16 +24,16 @@ def abc():
   global cord,cordStr
   cord=request.args.get('loc')[:-1]
   cordStr=convCords(cord)
-  # print(type(cord))
-  mainOut=main_func() 
-  print(cord)
+  # #print(type(cord))
+  main_func() 
+  # #print(cord)
   return {'cord':cord}
 
 
 @app.route('/result')
 def xyz():
   # data=request.args.get('data')
-  # print(data)
+  # #print(data)
   return render_template('result.html')
 
 def convCords(crd):
@@ -44,10 +43,20 @@ def convCords(crd):
 def createNewCords(route):
   temp=""
   for i in route:
-    temp+=cordStr[int(i)  ]+";"
-  print("ooooo",temp)
+    temp+=cordStr[int(i)]+";"
+  #print("ooooo",temp)
   cord=temp
   
+#floors every value in the datamatrix   
+def refineDataMatrix(dataMat):
+    n=len(dataMat)
+    for i in range(n):
+        temp=[]
+        for j in dataMat[i]:
+            temp.append(math.ceil(j))
+        dataMat[i]=temp
+    print(dataMat)
+    return dataMat  
 
 def findDistMatrix(mode="driving"):
   URL = "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/"+cord+"?annotations=distance&access_token=pk.eyJ1Ijoia3VzaDc4IiwiYSI6ImNsMzVqZHF3djBmMWMza3A1c2MzY3Y1NjkifQ.-PI6HfCVSnQVi5MguiQISQ"
@@ -57,7 +66,7 @@ def findDistMatrix(mode="driving"):
   
   # extracting data in json format
   data = r.json()
-  # print(data['durations'])
+  print(data['distances'])
   return data['distances']
 
 # def routrFinder(disMatrix):
@@ -65,15 +74,16 @@ def findDistMatrix(mode="driving"):
 def create_data_model():
     """Stores the data for the problem."""
     data = {}
-    data['distance_matrix'] = findDistMatrix()  # yapf: disable
+    data['distance_matrix'] = refineDataMatrix(findDistMatrix())  # yapf: disable
     data['num_vehicles'] = 1
     data['depot'] = 0
+    # print("data=",data)
     return data
 
 
 def print_solution(manager, routing, solution):
-    """Prints solution on console."""
-    # print('Objective: {} miles'.format(solution.ObjectiveValue()))
+    """#prints solution on console."""
+    # #print('Objective: {} miles'.format(solution.ObjectiveValue()))
     index = routing.Start(0)
     plan_output = ''
     route_distance = 0
@@ -85,6 +95,7 @@ def print_solution(manager, routing, solution):
 
     plan_output += '{}'.format(manager.IndexToNode(index))
     createNewCords(plan_output)    
+    # print(plan_output)
     plan_output += 'Route distance: {}miles\n'.format(route_distance)
     print(plan_output)
 
@@ -101,10 +112,8 @@ def main_func():
     # Create Routing Model.
     routing = pywrapcp.RoutingModel(manager)
     
-
-
     def distance_callback(from_index, to_index):
-        # print("routing",routing)
+        # #print("routing",routing)
         """Returns the distance between the two nodes."""
         # Convert from routing variable Index to distance matrix NodeIndex.
         from_node = manager.IndexToNode(from_index)
@@ -123,11 +132,10 @@ def main_func():
 
     # Solve the problem.
     solution = routing.SolveWithParameters(search_parameters)
-
-    # Print solution on console.
+    # print(routing)
+    # #print solution on console.
     if solution:
         print_solution(manager, routing, solution)
-
 
 if __name__ == '__main__':
   app.run(debug=True)

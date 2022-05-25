@@ -47,6 +47,15 @@
         margin: 0;
         font-size: 13px;
     } */
+        .marker {
+            background-image: url('/static/mapbox-icon.png');
+            background-size: cover;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
         #instructions {
             position: absolute;
             height: 50px;
@@ -77,6 +86,7 @@
 
     <script>
         // console.log(window.location.href)
+        // marker([28.459033019728068,78.93322309722983]).addTo(map);
         var url_string = window.location.href; //window.location.href
         var url = new URL(url_string);
         var latLong = url.searchParams.get("data");
@@ -86,9 +96,9 @@
         var map = new mapboxgl.Map({
             container: 'map', // container id
             style: 'mapbox://styles/mapbox/streets-v9', //hosted style id
-            center: [79.19501305399261,29.406104996908546], // starting position
-            zoom: 3, // starting zoom
-            minZoom: 11 // keep it local
+            center: [Math.floor(latLong.split(";")[0].split(",")[0]), Math.floor(latLong.split(";")[0].split(
+                ",")[1])], // starting position
+            minZoom: 1 // keep it local
         });
         //  geocoder here
         var geocoder = new MapboxGeocoder({
@@ -107,6 +117,7 @@
 
             });
         });
+
         var draw = new MapboxDraw({
             displayControlsDefault: false,
             controls: {
@@ -193,7 +204,7 @@
                 // get route directions on load map
                 steps.forEach(function (step) {
                     instructions.insertAdjacentHTML('beforeend', '<p>' + step.maneuver.instruction +
-                    '</p>');
+                        '</p>');
                 });
                 // get distance and duration
                 instructions.insertAdjacentHTML('beforeend', '<p>' + 'Distance: ' + distance.toFixed(2) +
@@ -207,6 +218,9 @@
             req.send();
         }
 
+        function addmarker(coords) {
+
+        };
         // adds the route as a layer on the map
         function addRoute(coords) {
             // check if the route is already loaded
@@ -249,6 +263,11 @@
             }
         }
         // document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+        const el = document.createElement('div');
+el.className = 'marker';
+ // 28.545925723233477, lng: 77.25877766082516
+  // make a marker for each feature and add to the map
+new mapboxgl.Marker(el).setLngLat([77.25877766082516, 28.545925723233477]).addTo(map);
     </script>
 
 </body>

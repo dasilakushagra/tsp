@@ -1,32 +1,93 @@
-var map=new MapmyIndia.Map("map",{ center:[29.406104996908546,79.19501305399261],zoomControl: true,hybrid:true });
-let loc="";
-map.on("click", function (e)
-{
-var pt = e.latlng; //event returns lat lng of clicked point
-    console.log(pt);
-    L.marker([pt.lat,pt.lng]).addTo(map);
-    loc+=pt.lng+","+pt.lat+";";
-//Do your related operation here
+// 
+
+
+var map = new MapmyIndia.Map('map', {
+    center: [28.09, 78.3],
+    zoom: 5,
+    search: false
 });
-// -122.42,37.78;-122.45,37.91;-122.48,37.73
-// document.getElementById('submit-btn').addEventListener('click',findDistanceMatrix);
+
+/*Search plugin initialization*/
+var optional_config = {
+    location: [28.61, 77.23],
+    /* pod:'City',
+     bridge:true,
+     tokenizeAddress:true,*
+     filter:'cop:9QGXAM',
+     distance:true,
+     width:300,
+     height:300*/
+};
+new MapmyIndia.search(document.getElementById("auto"), optional_config, callback);
+
+/*CALL for fix text - LIKE THIS
+ * 
+ new MapmyIndia.search("agra",optional_config,callback);
+ * 
+ * */
+let loc = "";
+map.addEventListener("click", function (e) {
+    var pt = e.latlng; //event returns lat lng of clicked point
+    console.log(pt);
+    L.marker([pt.lat, pt.lng]).addTo(map);
+    loc += pt.lng + "," + pt.lat + ";";
+    //Do your related operation here
+});
+var marker;
+
+function callback(data) {
+    if (data) {
+        if (data.error) {
+            if (data.error.indexOf('responsecode:401') !== -1) {
+                /*TOKEN EXPIRED, set new Token ie. 
+                 * MapmyIndia.setToken(newToken);
+                 */
+            }
+            console.warn(data.error);
+
+        } else {
+            var dt = data[0];
+            if (!dt) return false;
+            var eloc = dt.eLoc;
+            var lat = dt.latitude,
+                lng = dt.longitude;
+
+            var place = dt.placeName + (dt.placeAddress ? ", " + dt.placeAddress : "");
+            /*Use elocMarker Plugin to add marker*/
+            if (marker) marker.remove();
+            if (eloc) marker = new MapmyIndia.elocMarker({
+                map: map,
+                eloc: lat ? lat + "," + lng : eloc,
+                popupHtml: place,
+                popupOptions: {
+                    openPopup: true
+                }
+            }).fitbounds();
+            new MapmyIndia.elocMarker({
+                map: map,
+                eloc: "28.408389744145275" ? "28.408389744145275" + "," + "79.18769359588624" : eloc
+            });
+            // lat: 28.408389744145275
 
 
-/* async function findDistanceMatrix(){
-    var link="https://api.mapbox.com/directions-matrix/v1/mapbox/driving/"+loc.slice(0,loc.length-1)+"?approaches=curb;curb;curb;curb&access_token=pk.eyJ1Ijoia3VzaDc4IiwiYSI6ImNsMzVqZHF3djBmMWMza3A1c2MzY3Y1NjkifQ.-PI6HfCVSnQVi5MguiQISQ";
-    let response = await fetch(link);
-    let data = await response.json();
-    console.log(data);
-} */
+        }
+    }
+}
+const submitBtn = document.getElementsByClassName('submit-btn')[0]
 
-// ======= sending data to flask============
-const submitBtn=document.getElementById('submit-btn')
-submitBtn.addEventListener('click',async function(){
-        console.log('clicked')
-        const res=await fetch(`http://127.0.0.1:5000/api?loc=${loc}`)
-        const data=await res.json()
-        console.log(data)
-        setTimeout(()=>{
-        window.location.href=`http://127.0.0.1:5000/result?data=${data.cord}`
-        },1000)       
+submitBtn.addEventListener('click', async function () {
+    console.log('clicked')
+    const res = await fetch(`http://127.0.0.1:5000/api?loc=${loc}`)
+    const data = await res.json()
+    console.log(data)
+    setTimeout(() => {
+        window.location.href = `http://127.0.0.1:5000/result?data=${data.cord}`
+    }, 1000)
 })
+
+// +========addMarkerREsult.html========
+// const el = document.createElement('div');
+// el.className = 'marker';
+//  // 28.545925723233477, lng: 77.25877766082516
+//   // make a marker for each feature and add to the map
+// new mapboxgl.Marker(el).setLngLat([77.25877766082516, 28.545925723233477]).addTo(map);
