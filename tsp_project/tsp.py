@@ -40,12 +40,14 @@ def convCords(crd):
   new_crd=list(crd.split(";"))
   return new_crd
 
+# 23154
+# 79.5279559493065,29.214023169545694;79.5279398560524,29.21401848746733;79.52821880578996,29.214161290761176
 def createNewCords(route):
   temp=""
   for i in route:
     temp+=cordStr[int(i)]+";"
   #print("ooooo",temp)
-  cord=temp
+  cord=temp+cordStr[0]+";"
   
 #floors every value in the datamatrix   
 def refineDataMatrix(dataMat):
@@ -57,6 +59,7 @@ def refineDataMatrix(dataMat):
         dataMat[i]=temp
     print(dataMat)
     return dataMat  
+
 
 def findDistMatrix(mode="driving"):
   URL = "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/"+cord+"?annotations=distance&access_token=pk.eyJ1Ijoia3VzaDc4IiwiYSI6ImNsMzVqZHF3djBmMWMza3A1c2MzY3Y1NjkifQ.-PI6HfCVSnQVi5MguiQISQ"
